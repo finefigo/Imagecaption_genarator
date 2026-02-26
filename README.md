@@ -1,42 +1,49 @@
 # 🎨 AI-Powered Image Caption Generator with Mood Customization
 
-An intelligent Streamlit web application that generates image captions using the **BLIP** (Bootstrapped Language-Image Pretraining) model and transforms them into different emotional tones.
+An intelligent Streamlit web application that generates creative image captions using **Google's Gemini 2.5 Flash** model and transforms them into different emotional tones through a two-stage AI pipeline.
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red?logo=streamlit)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange?logo=pytorch)
-![HuggingFace](https://img.shields.io/badge/🤗_Transformers-4.30+-yellow)
+![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-Google_AI-4285F4?logo=google)
 
 ---
 
 ## ✨ Features
 
-- **AI Image Captioning** — Generate context-aware captions using BLIP Vision Transformer
+- **Gemini 2.5 Flash AI** — Generates context-aware, creative captions using Google's latest multimodal model
+- **Two-Stage Pipeline** — Stage A (vision analysis) + Stage B (mood rewrite) for high-quality results
 - **8 Mood Styles** — Normal, Happy, Sad, Funny, Romantic, Dramatic, Inspirational, Poetic
-- **Creativity Control** — Adjustable temperature slider (0.1–1.5)
-- **Beam Search** — Configurable beam width for higher quality captions
+- **Creativity Control** — Adjustable temperature slider (0.1–1.5) with mood-specific multipliers
 - **Download Captions** — Export captions as `.txt` files
-- **CPU Optimized** — Runs on CPU with GPU auto-detection
-- **Modern UI** — Dark glassmorphic theme with animations
+- **Cloud-Powered** — No local GPU required; all inference runs on Google's cloud
+- **Modern UI** — Premium dark glassmorphic theme with animations
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Image Upload → Image Preprocessing → Vision Encoder (ViT)
-    → Cross-Attention → Transformer Decoder → Base Caption
-    → Mood Prompt Conditioning → Temperature Control
-    → Mood-Enhanced Caption
+Image Upload → Gemini 2.5 Flash (Vision + Language)
+    → Stage A: Vision-to-Suggestion Pass → Base Caption
+    → Stage B: Text-Only Mood Rewrite → Mood-Enhanced Caption
 ```
+
+### Two-Stage Pipeline
+
+| Stage | Description | Input | Output |
+|---|---|---|---|
+| **Stage A** | Vision-to-Suggestion Pass | Image + prompt | Creative base caption |
+| **Stage B** | Mood Transformation Pass | Base caption + mood instruction (text-only) | Mood-enhanced caption |
+
+### Tech Stack
 
 | Component | Technology |
 |---|---|
-| Vision Encoder | Vision Transformer (ViT-Large, 576 patches) |
-| Text Decoder | Transformer with Cross-Attention |
-| Mood Engine | Prompt-based Conditional Generation |
+| AI Model | Google Gemini 2.5 Flash |
+| API Client | `google-genai` SDK |
+| Mood Engine | Instruction-based zero-shot rewriting |
 | Frontend | Streamlit with custom CSS |
-| Model | `Salesforce/blip-image-captioning-large` |
+| Image Processing | Pillow (PIL) |
 
 ---
 
@@ -44,7 +51,8 @@ Image Upload → Image Preprocessing → Vision Encoder (ViT)
 
 ### 1. Clone & Navigate
 ```bash
-cd Imagecaption_genarator(bct)
+git clone https://github.com/finefigo/Imagecaption_genarator.git
+cd Imagecaption_genarator
 ```
 
 ### 2. Create Virtual Environment
@@ -59,12 +67,15 @@ venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 ```
 
-### 4. Run the App
+### 4. Set Up API Key
+Get a free API key from [Google AI Studio](https://aistudio.google.com/apikey) and update it in `models/caption_engine.py`.
+
+### 5. Run the App
 ```bash
 streamlit run streamlit_app.py
 ```
 
-The app opens at `http://localhost:8501`. The BLIP model (~1.5GB) downloads automatically on first run.
+The app opens at `http://localhost:8501`. No large model downloads — Gemini runs in the cloud!
 
 ---
 
@@ -76,8 +87,8 @@ The app opens at `http://localhost:8501`. The BLIP model (~1.5GB) downloads auto
 ├── README.md                 # This file
 ├── CUSTOM_MODEL_GUIDE.md     # Guide to train your own model
 ├── models/
-│   ├── __init__.py
-│   ├── caption_engine.py     # BLIP model loading & generation
+│   ├── __init__.py           # Package init
+│   ├── caption_engine.py     # Gemini API client & caption generation
 │   └── mood_transformer.py   # Mood transformation engine
 └── .streamlit/
     └── config.toml           # Theme configuration
@@ -100,14 +111,20 @@ The app opens at `http://localhost:8501`. The BLIP model (~1.5GB) downloads auto
 
 ---
 
-## 🧠 Key AI Concepts (see code comments for details)
+## 🧠 How It Works
 
-- **Vision Transformers (ViT)** — Patch-based image encoding with self-attention
-- **Cross-Attention** — Bridges image embeddings with text generation
-- **Autoregressive Decoding** — Word-by-word text generation
-- **Beam Search** — Explores multiple caption candidates for better quality
-- **Temperature** — Controls creativity vs. accuracy tradeoff
-- **Prompt Conditioning** — Steers generation toward specific emotional tones
+### Stage A: Vision-to-Suggestion Pass
+The raw image is sent to Gemini 2.5 Flash alongside a creative suggestion prompt. The model's built-in Vision Transformer (ViT) analyzes the image patches to identify subjects, lighting, and context, then generates a catchy, social-media-ready caption.
+
+### Stage B: Mood Transformation Pass
+If a mood other than "Normal" is selected, a **text-only** request is made (no image sent). The base caption from Stage A is combined with a mood-specific rewrite instruction. The model uses zero-shot conditioning to rewrite the caption while preserving the original meaning.
+
+### Key AI Concepts
+- **Multimodal Understanding** — Gemini processes both images and text natively
+- **Autoregressive Decoding** — Word-by-word text generation based on image features and preceding words
+- **Zero-Shot Conditioning** — No fine-tuning needed; the LLM already understands mood concepts from pretraining
+- **Temperature Control** — Controls creativity vs. accuracy tradeoff, with mood-specific multipliers
+- **Semantic Preservation** — Mood rewrites maintain the original caption's meaning
 
 ---
 
@@ -123,4 +140,4 @@ The app opens at `http://localhost:8501`. The BLIP model (~1.5GB) downloads auto
 
 ## 📝 License
 
-This project is for educational purposes. BLIP model is by [Salesforce Research](https://github.com/salesforce/BLIP).
+This project is for educational purposes. Powered by [Google Gemini](https://ai.google.dev/).
