@@ -10,7 +10,7 @@ class CaptionEngine:
     
 
     # ── Gemini API Key ──
-    API_KEY = "AIzaSyC7Ag7mh8qLI7cfcBUrKl_3PYsNPEpaCkc"
+    API_KEY = "Your API Key"
 
     # ── Max retries for rate-limited requests ──
     MAX_RETRIES = 5
